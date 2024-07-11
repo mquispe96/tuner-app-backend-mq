@@ -22,7 +22,7 @@ songs.get('/:id', async (req, res) => {
   }
 });
 
-songs.post('/', requiredFields,async (req, res) => {
+songs.post('/', requiredFields, async (req, res) => {
   const newSong = await createSong(req.body);
   if (newSong.id) {
     res.status(200).json(newSong);
