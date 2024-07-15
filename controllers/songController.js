@@ -5,9 +5,10 @@ const {
   getSongById,
   createSong,
   updateSong,
+  updateFavoriteStatus,
   deleteSong,
   sortSongs,
-  filterSongs
+  filterSongs,
 } = require('../queries/song.js');
 const {requiredFields} = require('../validations/songValidations.js');
 
@@ -27,8 +28,7 @@ songs.get('/sort', async (req, res) => {
     res.status(200).json(allSongs);
   } else {
     res.status(500).json({
-      error:
-        'server error.'
+      error: 'server error.',
     });
   }
 });
@@ -39,12 +39,9 @@ songs.get('/filter', async (req, res) => {
   if (allSongs[0]) {
     res.status(200).json(allSongs);
   } else {
-    res
-      .status(500)
-      .json({
-        error:
-          'server error.'
-      });
+    res.status(500).json({
+      error: 'server error.',
+    });
   }
 });
 
@@ -70,6 +67,16 @@ songs.post('/', requiredFields, async (req, res) => {
 songs.put('/:id', requiredFields, async (req, res) => {
   const {id} = req.params;
   const updatedSong = await updateSong(id, req.body);
+  if (updatedSong.id) {
+    res.status(200).json(updatedSong);
+  } else {
+    res.status(500).json({error: 'server error'});
+  }
+});
+
+songs.patch('/:id', async (req, res) => {
+  const {id} = req.params;
+  const updatedSong = await updateFavoriteStatus(id, req.body.is_favorite);
   if (updatedSong.id) {
     res.status(200).json(updatedSong);
   } else {

@@ -37,7 +37,10 @@ const updateSong = async (id, song) => {
       name: song.name || currentSongData.name,
       artist: song.artist || currentSongData.artist,
       album: song.album || currentSongData.album,
-      is_favorite: song.is_favorite || currentSongData.is_favorite,
+      is_favorite:
+        song.is_favorite === undefined
+          ? currentSongData.is_favorite
+          : song.is_favorite,
       time: song.time || currentSongData.time,
     };
     const updatedSong = await db.one(
@@ -50,6 +53,18 @@ const updateSong = async (id, song) => {
         updatedSongData.time,
         id,
       ],
+    );
+    return updatedSong;
+  } catch (error) {
+    return error;
+  }
+};
+
+const updateFavoriteStatus = async (id, is_favorite) => {
+  try {
+    const updatedSong = await db.one(
+      'UPDATE songs SET is_favorite = $1 WHERE id = $2 RETURNING *',
+      [is_favorite, id],
     );
     return updatedSong;
   } catch (error) {
@@ -113,4 +128,5 @@ module.exports = {
   deleteSong,
   sortSongs,
   filterSongs,
+  updateFavoriteStatus,
 };
