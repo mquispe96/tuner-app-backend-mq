@@ -42,7 +42,14 @@ const updateSong = async (id, song) => {
     };
     const updatedSong = await db.one(
       'UPDATE songs SET name = $1, artist = $2, album = $3, is_favorite = $4, time = $5 WHERE id = $6 RETURNING *',
-      [updatedSongData.name, updatedSongData.artist, updatedSongData.album, updatedSongData.is_favorite, updatedSongData.time, id],
+      [
+        updatedSongData.name,
+        updatedSongData.artist,
+        updatedSongData.album,
+        updatedSongData.is_favorite,
+        updatedSongData.time,
+        id,
+      ],
     );
     return updatedSong;
   } catch (error) {
@@ -62,4 +69,49 @@ const deleteSong = async id => {
   }
 };
 
-module.exports = {getAllSongs, getSongById, createSong, updateSong, deleteSong};
+const sortSongs = async query => {
+  const validKeys = ['name', 'artist', 'album', 'is_favorite', 'time'];
+  const validDirections = ['ASC', 'DESC', 'asc', 'desc'];
+  const {key, direction} = query;
+  if (!validKeys.includes(key)) {
+    return {error: 'invalid key'};
+  }
+  if (!validDirections.includes(direction)) {
+    return {error: 'invalid direction'};
+  }
+  try {
+    const sortedSongs = await db.any(
+      `SELECT * FROM songs ORDER BY ${key} ${direction}`,
+    );
+    return sortedSongs;
+  } catch (error) {
+    return error;
+  }
+};
+
+const filterSongs = async query => {
+  const validKeys = ['name', 'artist', 'album', 'is_favorite', 'time'];
+  const {key, value} = query;
+  if (!validKeys.includes(key)) {
+    return {error: 'invalid key'};
+  }
+  try {
+    const searchValue = "'%" + value + "%'";
+    const filteredSongs = await db.any(
+      `SELECT * FROM songs WHERE ${key} ILIKE ${searchValue}`,
+    );
+    return filteredSongs;
+  } catch (error) {
+    return error;
+  }
+};
+
+module.exports = {
+  getAllSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong,
+  sortSongs,
+  filterSongs,
+};

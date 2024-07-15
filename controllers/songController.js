@@ -1,6 +1,14 @@
 const express = require('express');
 const songs = express.Router();
-const {getAllSongs, getSongById, createSong, updateSong, deleteSong} = require('../queries/song.js');
+const {
+  getAllSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong,
+  sortSongs,
+  filterSongs
+} = require('../queries/song.js');
 const {requiredFields} = require('../validations/songValidations.js');
 
 songs.get('/', async (req, res) => {
@@ -9,6 +17,34 @@ songs.get('/', async (req, res) => {
     res.status(200).json(allSongs);
   } else {
     res.status(500).json({error: 'server error'});
+  }
+});
+
+songs.get('/sort', async (req, res) => {
+  const query = req.query;
+  const allSongs = await sortSongs(query);
+  if (allSongs[0]) {
+    res.status(200).json(allSongs);
+  } else {
+    res.status(500).json({
+      error:
+        'server error.'
+    });
+  }
+});
+
+songs.get('/filter', async (req, res) => {
+  const query = req.query;
+  const allSongs = await filterSongs(query);
+  if (allSongs[0]) {
+    res.status(200).json(allSongs);
+  } else {
+    res
+      .status(500)
+      .json({
+        error:
+          'server error.'
+      });
   }
 });
 
@@ -40,9 +76,6 @@ songs.put('/:id', requiredFields, async (req, res) => {
     res.status(500).json({error: 'server error'});
   }
 });
-
-
-
 
 songs.delete('/:id', async (req, res) => {
   const {id} = req.params;
