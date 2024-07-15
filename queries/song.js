@@ -96,9 +96,8 @@ const filterSongs = async query => {
     return {error: 'invalid key'};
   }
   try {
-    const searchValue = "'%" + value + "%'";
     const filteredSongs = await db.any(
-      `SELECT * FROM songs WHERE ${key} ILIKE ${searchValue}`,
+      `SELECT * FROM songs WHERE ${key} ILIKE '%${value}%'`,
     );
     return filteredSongs;
   } catch (error) {
