@@ -1,5 +1,7 @@
 # tuner-api-solution
 
+[Tuner App Frontend Repo](https://github.com/mquispe96/tuner-app-frontend-mq)
+
 - `touch .env`
 
 **.env**
